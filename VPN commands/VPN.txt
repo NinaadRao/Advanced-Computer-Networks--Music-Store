@@ -1,0 +1,63 @@
+
+#The configuration is done at router connecting to the cloud (internet).
+enable
+configure
+aaa new-model
+aaa authentication login REMOTE local
+
+aaa authorization network REMOTE local
+
+username VPN secret supersecure
+
+#Internet association key management protocol
+crypto isakmp policy 10
+encryption aes 256
+hash md5
+authentication pre-share
+group 2
+lifetime 70000
+exit
+
+crypto isakmp client configuration group REMOTE
+key CISCO
+pool MYPOOL
+
+#IPsec protocol
+crypto ipsec transform-set MYSET esp-aes 256 esp-md5-hmac
+
+#creating dynamic map
+crypto dynamic-map DYNMAP 10
+set transform-set MYSET
+reverse-route
+exit
+
+#creating crypto map
+crypto map CLIENT_MAP client authentication list REMOTE
+crypto map CLIENT_MAP isakmp authorization list REMOTE
+crypto map CLIENT_MAP client configuration address respond
+crypto map CLIENT_MAP 10 ipsec-isakmp dynamic DYNMAP
+
+#the ip address assigned for the remote system once it is out of the tunnel
+ip local pool MYPOOL 10.1.1.150 10.1.1.200
+
+#configuring at the gateway interface
+crypto map CLIENT_MAP
+
+#For seeing isakmp security associations
+show crypto isakmp sa 
+
+#For seeing ipsec info
+show crypto ipsec sa
+
+---
+
+For creating a vpn :
+
+1. Click on the remote system . Select VPN from desktop.
+2. In the vpn gui enter the required details .
+   In our configuration those are:
+        GROUPNAME  : REMOTE
+        GROUPKEY   : CISCO
+        Host IP    : gateway ip (10.10.1.14)
+        Username   : VPN
+        Password   : supersecure

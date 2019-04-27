@@ -1,0 +1,22 @@
+VLAN
+go to the router and configure the topology
+
+Click on the switch and enter VLAN Database entries for the vlan you want to create:
+eg: VLAN Number:2(1 is default)
+    VLAN Name: Office
+Click on each interface and number their vlan numbers.
+Next click on the interface which needs to be trunk port and click on trunk option
+
+
+Click on the router and add the vlan entries
+
+After adding, go to CLI
+Router(vlan)#exit
+Router#config t
+Router(config)# int f0/0.1
+Router(config-subif)#encapsulation dot1q <vlan number>
+Router(config-subif)# ip address <ip address of teh vlan gateway> <sub-net mask>
+Router(config-subif)#exit
+Router(config)#exit
+Router#
+(Close the window and test the connections)
